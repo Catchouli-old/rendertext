@@ -53,11 +53,11 @@ main = void $ do
           glClearColor 0 0 0 1
           glClear GL_COLOR_BUFFER_BIT
 
-          glEnableVertexAttribArray 0
+          glEnableVertexAttribArray =<< attribLoc program "in_pos"
           glBindBuffer GL_ARRAY_BUFFER vbo
           glVertexAttribPointer 0 3 GL_FLOAT GL_FALSE 0 nullPtr
           glDrawArrays GL_TRIANGLES 0 3
-          glDisableVertexAttribArray 0
+          glDisableVertexAttribArray =<< attribLoc program "in_pos"
 
           SDL.glSwapWindow window
 
@@ -164,3 +164,11 @@ loadShaderProgram v f = do
   glDeleteShader vert
   glDeleteShader frag
   return prog
+
+-- | Get the location for a shader attribute
+attribLoc :: GLuint -> String -> IO GLuint
+attribLoc program str = do withCString str (glGetAttribLocation program) >>= return . fromIntegral
+
+-- | Get the location for a shader uniform
+uniformLoc :: GLuint -> String -> IO GLuint
+uniformLoc program str = do withCString str (glGetUniformLocation program) >>= return . fromIntegral
