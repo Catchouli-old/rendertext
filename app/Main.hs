@@ -16,6 +16,11 @@ import qualified Data.Text as T
 import qualified Data.Text.IO as T
 import qualified SDL as SDL
 
+import qualified Graphics.Rendering.Pango.Enums as P
+import qualified Graphics.Rendering.Pango.Cairo as P
+import qualified Graphics.Rendering.Pango.Layout as P
+import qualified Graphics.Rendering.Cairo as P
+
 -- Parameters
 (width, height) = (800, 600)
 title = "Hello world"
@@ -40,6 +45,14 @@ main = void $ do
   -- Load data
   -- A triangle vertex buffer
   vbo <- uploadBuffer undefined CFloat [-1, -1, 0, 1, -1, 0, 0, 1, 0]
+
+  ctx <- P.cairoCreateContext Nothing
+  P.withImageSurface P.FormatRGB24 1024 768
+    (\s -> do
+      layout <- P.layoutText ctx ("hello world" :: String)
+      P.renderWith s $ P.setSourceRGB 1 1 1 >> P.showLayout layout
+      P.surfaceWriteToPNG s "/home/cat/test.png"
+    )
 
   -- Main loop
   let loop = do
